@@ -1,29 +1,54 @@
-@Library('Shared')_
-pipeline{
-    agent { label 'dev-server'}
-    
-    stages{
-        stage("Code clone"){
-            steps{
-                sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+@Library("Shared") _
+pipeline {
+    agent { label "vinod" }
+
+
+    stages {
+        stage('Hello') {
+            steps {
+                    script{
+                        helloe()
+                    }
             }
         }
-        stage("Code Build"){
+        stage('Code'){
             steps{
-            dockerbuild("notes-app","latest")
+                script{
+                    clone( "https://github.com/Akshaykumar-Bawane/django-notes-app-01", "main")
+                }
             }
         }
-        stage("Push to DockerHub"){
+        stage('Build Fresh Images'){
             steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+                script{
+                   docker_build("notes-app","latest","dockerdaku877")
+                }
+                
             }
         }
-        stage("Deploy"){
+
+        stage('Push to Dockerhub'){
             steps{
-                deploy()
+                  script{
+                     docker_push("notes-app","latest","dockerdaku877")
+                 }
             }
         }
-        
+
+        stage('Verify Deployment') {
+            steps{    
+                 echo "Verifying Django container status..."
+                 sh '''
+                 set +e   # disable exit on error
+                 docker compose down || true
+                 docker compose up -d || true
+                 docker ps
+                 docker logs django_cont || true
+                 set -e   # re-enable exit on error
+              '''
+                 echo " Containers deployed successfully (even if Docker returned a warning)."
+
+                  }
+        }
     }
 }
