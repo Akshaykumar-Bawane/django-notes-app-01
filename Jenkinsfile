@@ -47,7 +47,6 @@ pipeline {
                  set -e   # re-enable exit on error
               '''
                  echo " Containers deployed successfully (even if Docker returned a warning) "
-                 echo "DONE"
 
                   }
         }
