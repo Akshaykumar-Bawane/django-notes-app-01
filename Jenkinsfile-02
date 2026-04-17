@@ -1,5 +1,5 @@
 pipeline {
-    agent { label "megatron" }
+    agent any
 
 
     stages {
